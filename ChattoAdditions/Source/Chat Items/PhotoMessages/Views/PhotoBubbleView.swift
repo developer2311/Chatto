@@ -175,7 +175,25 @@ open class PhotoBubbleView: UIView, MaximumLayoutWidthSpecificable, BackgroundSi
             self.overlayView.alpha = 0
         }
         self.borderView.image = self.photoMessageStyle.borderImage(viewModel: photoMessageViewModel)
-        self.imageView.layer.mask = UIImageView(image: self.photoMessageStyle.maskingImage(viewModel: self.photoMessageViewModel)).layer
+        // - The old one -
+//        self.imageView.layer.mask = UIImageView(image: self.photoMessageStyle.maskingImage(viewModel: self.photoMessageViewModel)).layer
+        
+        // - The new one -
+        imageView.layer.mask = maskLayerForPhotoImageView()
+    }
+    
+    private func maskLayerForPhotoImageView() -> CALayer {
+        let maskImage = self.photoMessageStyle.maskingImage(viewModel: self.photoMessageViewModel)
+        let layer = CALayer()
+        layer.contents = maskImage.cgImage
+        layer.contentsScale = maskImage.scale
+        layer.contentsCenter = CGRect(
+                x: ((maskImage.size.width/2) - 1)/maskImage.size.width,
+                y: ((maskImage.size.height/2) - 1)/maskImage.size.height,
+                width: 1 / maskImage.size.width,
+                height: 1 / maskImage.size.height)
+        layer.frame = imageView.bounds
+        return layer
     }
 
     // MARK: Layout
